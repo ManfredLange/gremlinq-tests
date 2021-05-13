@@ -1,0 +1,5 @@
+bin
+obj
+data
+data-test
+appsettings.Production.json

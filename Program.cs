@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace gremlinq_tests
+{
+    static class Program
+    {
+        private static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+        }
+    }
+}
