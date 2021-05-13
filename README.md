@@ -12,4 +12,4 @@ docker pull janusgraph/janusgraph
 docker run -it -p 8182:8182 janusgraph/janusgraph
 ```
 
-Make sure you wait long enough for the server to report at the console that it has establish a channel at port 8182.
+Make sure you wait long enough for the server to report at the console that it has established a channel at port 8182.
