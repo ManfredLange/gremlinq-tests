@@ -12,11 +12,12 @@ namespace gremlinq_tests
       {
          var g = MakeGremlinQuerySource();
 
-         await g.AddV(new Person {
-            Oid = Guid.NewGuid(), 
+         await g.AddV(new Person
+         {
+            Oid = Guid.NewGuid(),
             Name = "Marko",
             Age = 29
-            }).FirstAsync().ConfigureAwait(false);
+         }).FirstAsync().ConfigureAwait(false);
 
          var peopleNamedMarko = await g.V<Person>().Where(p => p.Name == "Marko").ToArrayAsync().ConfigureAwait(false);
 
@@ -45,13 +46,13 @@ namespace gremlinq_tests
                .ConfigureOptions(options => options
                   .SetValue(WebSocketGremlinqOptions.QueryLogLogLevel, LogLevel.None))
 
-               .ConfigureSerializer(serializer => serializer
-                  .ConfigureFragmentSerializer(fragmentSerializer => fragmentSerializer
+               .ConfigureSerializer(s => s
+                  .ConfigureFragmentSerializer(f => f
                      .Override<Guid>((guid, env, _, recurse) => SerializeGuid(guid, env, recurse))
                   )
                )
-               .ConfigureDeserializer(deserializer => deserializer
-                  .ConfigureFragmentDeserializer(fragmentDeserializer => fragmentDeserializer
+               .ConfigureDeserializer(d => d
+                  .ConfigureFragmentDeserializer(f => f
                      .Override<Guid>((serializedData, requestedType, env, _, recurse) => DeserializeGuid(serializedData, requestedType, env, recurse))
                   )
                )
@@ -62,8 +63,11 @@ namespace gremlinq_tests
                // )
 
                .UseJanusGraph(builder => builder
-                  .At(new Uri("ws://localhost:2503"))))
-                  ;
+                  .AtLocalhost()
+               //.At(new Uri("ws://localhost:8182"))
+               )
+            )
+            ;
       }
       private static object? DeserializeGuid(Guid serializedData, Type requestedType, IGremlinQueryEnvironment env, IGremlinQueryFragmentDeserializer recurse)
       {
