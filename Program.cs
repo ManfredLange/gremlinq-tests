@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ExRam.Gremlinq.Core;
 using ExRam.Gremlinq.Providers.WebSocket;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace gremlinq_tests
 {
@@ -51,27 +52,39 @@ namespace gremlinq_tests
                      .Override<Guid>((guid, env, _, recurse) => SerializeGuid(guid, env, recurse))
                   )
                )
+
                .ConfigureDeserializer(d => d
                   .ConfigureFragmentDeserializer(f => f
-                     .Override<Guid>((serializedData, requestedType, env, _, recurse) => DeserializeGuid(serializedData, requestedType, env, recurse))
+                     .Override<JValue>((jValue, type, env, overridden, recurse) =>
+                     {
+                        if (type == typeof(Guid))
+                        {
+                           switch (jValue.Value)
+                           {
+                              case Guid guid:
+                                 return guid;
+                           }
+
+                           if(jValue.Type == JTokenType.String)
+                              return new Guid(jValue.Value<string>());
+                        }
+
+                        return overridden(jValue, type, env, recurse);
+                     })
                   )
                )
                // .ConfigureDeserializer(deserializer => deserializer
-               //    .ConfigureFragmentDeserializer(fragmentDeserializer => fragmentDeserializer
+               //    .ConfigureFragmentDeserializer(f => f
                //       .AddNewtonsoftJson()
                //    )
                // )
 
                .UseJanusGraph(builder => builder
                   .AtLocalhost()
-               //.At(new Uri("ws://localhost:8182"))
+                  //.At(new Uri("ws://localhost:8182"))
                )
             )
             ;
-      }
-      private static object? DeserializeGuid(Guid serializedData, Type requestedType, IGremlinQueryEnvironment env, IGremlinQueryFragmentDeserializer recurse)
-      {
-         return recurse.TryDeserialize(Guid.Parse(serializedData.ToString()), requestedType, env);
       }
 
       private static object SerializeGuid(Guid guid, IGremlinQueryEnvironment env, IGremlinQueryFragmentSerializer recurse)
