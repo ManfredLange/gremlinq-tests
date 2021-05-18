@@ -13,6 +13,8 @@ namespace gremlinq_tests
       {
          var g = MakeGremlinQuerySource();
 
+         await g.V().Drop().Count().FirstAsync().ConfigureAwait(false);
+
          await g.AddV(new Person
          {
             Oid = Guid.NewGuid(),
@@ -47,6 +49,11 @@ namespace gremlinq_tests
                .ConfigureOptions(options => options
                   .SetValue(WebSocketGremlinqOptions.QueryLogLogLevel, LogLevel.None))
 
+               .UseJanusGraph(builder => builder
+                  .AtLocalhost()
+                  //.At(new Uri("ws://localhost:8182"))
+               )
+
                .ConfigureSerializer(s => s
                   .ConfigureFragmentSerializer(f => f
                      .Override<Guid>((guid, env, _, recurse) => SerializeGuid(guid, env, recurse))
@@ -78,11 +85,6 @@ namespace gremlinq_tests
                //       .AddNewtonsoftJson()
                //    )
                // )
-
-               .UseJanusGraph(builder => builder
-                  .AtLocalhost()
-                  //.At(new Uri("ws://localhost:8182"))
-               )
             )
             ;
       }
