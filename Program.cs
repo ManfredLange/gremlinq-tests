@@ -39,6 +39,8 @@ namespace gremlinq_tests
                .UseModel(GraphModel
                   .FromBaseTypes<Vertex, Edge>(lookup => lookup
                         .IncludeAssembliesOfBaseTypes())
+                  .ConfigureNativeTypes(nativeTypes => nativeTypes
+                      .Add(typeof(Guid)))
                            //For CosmosDB, we exclude the 'PartitionKey' property from being included in updates.
                            // .ConfigureProperties(model => model
                            //     .ConfigureElement<Vertex>(conf => conf
@@ -53,40 +55,7 @@ namespace gremlinq_tests
                   .AtLocalhost()
                   //.At(new Uri("ws://localhost:8182"))
                )
-
-               .ConfigureSerializer(s => s
-                  .ConfigureFragmentSerializer(f => f
-                     .Override<Guid>((guid, env, _, recurse) => SerializeGuid(guid, env, recurse))
-                  )
-               )
-
-               .ConfigureDeserializer(d => d
-                  .ConfigureFragmentDeserializer(f => f
-                     .Override<JValue>((jValue, type, env, overridden, recurse) =>
-                     {
-                        if (type == typeof(Guid))
-                        {
-                           switch (jValue.Value)
-                           {
-                              case Guid guid:
-                                 return guid;
-                           }
-
-                           if(jValue.Type == JTokenType.String)
-                              return new Guid(jValue.Value<string>());
-                        }
-
-                        return overridden(jValue, type, env, recurse);
-                     })
-                  )
-               )
-               // .ConfigureDeserializer(deserializer => deserializer
-               //    .ConfigureFragmentDeserializer(f => f
-               //       .AddNewtonsoftJson()
-               //    )
-               // )
-            )
-            ;
+            );
       }
 
       private static object SerializeGuid(Guid guid, IGremlinQueryEnvironment env, IGremlinQueryFragmentSerializer recurse)
