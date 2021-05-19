@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ExRam.Gremlinq.Core;
 using ExRam.Gremlinq.Providers.WebSocket;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 
 namespace gremlinq_tests
 {
@@ -23,8 +22,8 @@ namespace gremlinq_tests
          }).FirstAsync().ConfigureAwait(false);
 
          var peopleNamedMarko = await g.V<Person>().Where(p => p.Name == "Marko").ToArrayAsync().ConfigureAwait(false);
-
-         Console.WriteLine($"Found {peopleNamedMarko.Length}.");
+         var firstPerson = peopleNamedMarko[0];
+         Console.WriteLine($"Found {peopleNamedMarko.Length}. First person's OID is {firstPerson.Oid}");
       }
       public static IGremlinQuerySource MakeGremlinQuerySource()
       {
@@ -56,11 +55,6 @@ namespace gremlinq_tests
                   //.At(new Uri("ws://localhost:8182"))
                )
             );
-      }
-
-      private static object SerializeGuid(Guid guid, IGremlinQueryEnvironment env, IGremlinQueryFragmentSerializer recurse)
-      {
-         return recurse.Serialize(guid.ToString(), env);
       }
    }
 
