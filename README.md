@@ -1,6 +1,6 @@
 # gremlinq-tests
 
-Minimal example that demonstrates how to configure (ExRam.Gremlinq)[https://github.com/ExRam/ExRam.Gremlinq] for properties of type `Guid`.
+Minimal example that demonstrates how to configure [ExRam.Gremlinq](https://github.com/ExRam/ExRam.Gremlinq) for properties of type `Guid`.
 
 # JanusGraph Server
 
